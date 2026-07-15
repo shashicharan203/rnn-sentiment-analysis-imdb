@@ -1,101 +1,241 @@
-# RNN-based Sentiment Analysis on IMDB Movie Reviews
+# 🎬 RNN-Based Sentiment Analysis on IMDB Movie Reviews
 
-A PyTorch implementation of a Recurrent Neural Network (RNN) for binary sentiment classification (positive/negative) on the IMDB movie reviews dataset, using classic NLP preprocessing and TF-IDF feature vectorization.
+A Deep Learning-based sentiment classification system that predicts whether an IMDB movie review expresses a **Positive** or **Negative** sentiment.
 
-## 📌 Overview
+The project implements a complete NLP pipeline including text preprocessing, TF-IDF feature extraction, PyTorch DataLoaders, and a custom Recurrent Neural Network (RNN) for binary sentiment classification.
 
-This project builds an end-to-end sentiment classification pipeline:
-1. Clean and preprocess 50,000 IMDB movie reviews
-2. Convert text to numerical features using TF-IDF
-3. Train a Recurrent Neural Network (RNN) classifier in PyTorch
-4. Evaluate model performance on a held-out test set
+**✅ Test Accuracy: ~85.1%**
 
-**Test Accuracy: ~85.1%**
+---
 
-## 🗂️ Dataset
+## 🚀 Project Overview
 
-- **Source:** [IMDB Dataset of 50K Movie Reviews](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews)
-- **Size:** 50,000 reviews (49,582 after removing duplicates)
-- **Labels:** `positive` / `negative`
+Sentiment Analysis is a Natural Language Processing (NLP) task used to identify the emotional tone of textual data.
 
-> Note: `IMDB Dataset.csv` is not included in this repo due to size. Download it from the link above and place it in the project root before running the notebook.
+In this project, an RNN model is trained on the **IMDB Movie Reviews Dataset** to classify movie reviews into two categories:
 
-## ⚙️ Tech Stack
+* 😊 Positive
+* 😞 Negative
 
-- Python, Pandas, NumPy
-- NLTK (tokenization, stopword removal, stemming)
-- Scikit-learn (`TfidfVectorizer`, `LabelEncoder`, `train_test_split`)
-- PyTorch (`nn.RNN`, `DataLoader`, `TensorDataset`)
+---
 
-## 🔄 Pipeline
+## 📊 Dataset
 
-### 1. Data Cleaning
-- Removed duplicate reviews
-- Lowercased text
-- Removed URLs, HTML tags, and punctuation using regex
+The project uses the **IMDB Dataset of 50K Movie Reviews** available on Kaggle.
 
-### 2. Text Preprocessing
-- Tokenization and stopword removal (NLTK)
-- Stemming using `PorterStemmer` (e.g., `running` → `run`)
+**Dataset:** [IMDB Dataset of 50K Movie Reviews](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews)
 
-### 3. Feature Engineering
-- Label encoding for sentiment (`positive` → 1, `negative` → 0)
-- TF-IDF vectorization (`max_features=5000`) to convert text into numerical feature vectors
+The dataset contains:
 
-### 4. Model Architecture
+| Feature | Description |
+|---|---|
+| Dataset Size | 50,000 Reviews |
+| Positive Reviews | 25,000 |
+| Negative Reviews | 25,000 |
+| Input Feature | Movie Review |
+| Target | Sentiment |
+
+After removing duplicate reviews, **49,582 unique samples** are used in the preprocessing and training pipeline.
+
+> **Note:** The dataset is not included in this repository. Download it from Kaggle and place `IMDB Dataset.csv` in the project directory before running the notebook.
+
+---
+
+## 🧹 Text Preprocessing
+
+The raw movie reviews are cleaned using multiple Natural Language Processing techniques:
+
+* Converting text to lowercase
+* Removing URLs
+* Removing punctuation and special characters
+* Removing HTML tags
+* Tokenizing text using NLTK
+* Removing English stopwords
+* Applying Porter Stemming
+* Encoding sentiment labels using `LabelEncoder`
+
+---
+
+## 🔢 Feature Extraction
+
+The processed movie reviews are converted into numerical features using **TF-IDF Vectorization**.
+
+```python
+TfidfVectorizer(max_features=5000)
 ```
-Input (5000-dim TF-IDF vector)
-      ↓
-   nn.RNN (hidden_size=128, num_layers=1)
-      ↓
- Fully Connected Layer (128 → 1)
-      ↓
-      Sigmoid → Probability (positive/negative)
+
+The model uses the **5,000 most relevant textual features** extracted from the movie reviews.
+
+---
+
+## 🧠 RNN Model Architecture
+
+A custom Recurrent Neural Network is implemented using PyTorch.
+
+```text
+TF-IDF Input Features
+        ↓
+Vanilla RNN Layer
+Hidden Size = 128
+        ↓
+Fully Connected Layer
+        ↓
+Sigmoid Activation
+        ↓
+Positive / Negative Sentiment
 ```
 
-### 5. Training
-- Loss: Binary Cross-Entropy (`BCELoss`)
-- Optimizer: Adam
-- Epochs: 10
-- Batch size: 64
+### Model Configuration
 
-## 📊 Results
+| Parameter | Value |
+|---|---|
+| Model | Vanilla RNN |
+| Input Features | 5000 |
+| Hidden Size | 128 |
+| Number of RNN Layers | 1 |
+| Output Size | 1 |
+| Activation | Sigmoid |
+| Loss Function | Binary Cross Entropy |
+| Optimizer | Adam |
+
+---
+
+## ⚙️ Training Pipeline
+
+The dataset is divided into:
+
+* **80% Training Data**
+* **20% Testing Data**
+
+PyTorch `TensorDataset` and `DataLoader` are used for efficient batch processing.
+
+### Training Configuration
+
+| Parameter | Value |
+|---|---|
+| Epochs | 10 |
+| Batch Size | 64 |
+| Optimizer | Adam |
+| Loss Function | BCELoss |
+| Decision Threshold | 0.5 |
+
+During training, the model performs:
+
+1. Forward propagation
+2. Sigmoid probability calculation
+3. Binary Cross Entropy loss computation
+4. Backpropagation
+5. Model parameter updates using Adam
+
+---
+
+## 📈 Model Evaluation
+
+The trained model is evaluated on unseen test data.
+
+Predictions are generated using a probability threshold of `0.5`.
+
+```python
+predicted = (
+    torch.sigmoid(outputs.squeeze()) > 0.5
+).float()
+```
+
+The final model performance is measured using **classification accuracy**.
+
+### Results
 
 | Metric | Value |
 |---|---|
-| Test Accuracy | ~85.15% |
+| **Test Accuracy** | **~85.15%** |
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-```bash
-pip install pandas numpy nltk scikit-learn torch
-```
+## 🛠️ Tech Stack
 
-### Run
-1. Download `IMDB Dataset.csv` and place it in the project root
-2. Open and run `RNN_for_sentimentanalysis.ipynb` cell by cell (or export/run as a script)
+* Python
+* PyTorch
+* Pandas
+* NumPy
+* Scikit-learn
+* NLTK
+* Natural Language Processing
+* Deep Learning
 
-```bash
-jupyter notebook RNN_for_sentimentanalysis.ipynb
-```
-
-## 🔧 Future Improvements
-
-- Replace TF-IDF with word embeddings (Word2Vec/GloVe) and feed actual token sequences into the RNN instead of a single-timestep TF-IDF vector, to properly leverage sequential/contextual information
-- Experiment with LSTM/GRU/Bidirectional RNN architectures for better long-range dependency handling
-- Add dropout and learning rate scheduling to reduce overfitting
-- Hyperparameter tuning (hidden size, number of layers, batch size)
-- Deploy as a simple web app (Streamlit/Flask) for live predictions
+---
 
 ## 📁 Project Structure
 
-```
-├── RNN_for_sentimentanalysis.ipynb   # Main notebook (preprocessing, model, training, evaluation)
-├── IMDB Dataset.csv                  # Dataset (not included, download separately)
+```text
+RNN-Sentiment-Analysis/
+│
+├── RNN_for_sentimentanalysis.ipynb
 └── README.md
 ```
 
-## 📄 License
+---
 
-This project is open source and available under the [MIT License](LICENSE).
+## ▶️ How to Run the Project
+
+### 1. Clone the Repository
+
+```bash
+git clone <your-repository-url>
+```
+
+### 2. Navigate to the Project Directory
+
+```bash
+cd RNN-Sentiment-Analysis
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install pandas numpy scikit-learn nltk torch jupyter
+```
+
+### 4. Download the Dataset
+
+Download the **IMDB Dataset of 50K Movie Reviews** from Kaggle.
+
+Place the downloaded file in the project directory:
+
+```text
+RNN-Sentiment-Analysis/
+│
+├── RNN_for_sentimentanalysis.ipynb
+├── IMDB Dataset.csv
+└── README.md
+```
+
+### 5. Start Jupyter Notebook
+
+```bash
+jupyter notebook
+```
+
+Open and run:
+
+```text
+RNN_for_sentimentanalysis.ipynb
+```
+
+---
+
+## 🔮 Future Improvements
+
+* Replace Vanilla RNN with LSTM or GRU
+* Use Word2Vec or GloVe word embeddings
+* Implement PyTorch Embedding layers
+* Add Precision, Recall and F1-Score metrics
+* Add confusion matrix visualization
+* Build a real-time sentiment prediction interface
+* Deploy the model using Flask or FastAPI
+
+---
+
+## 👤 Author
+
+**Kunku Shashi Charan**
+Machine Learning | Deep Learning | NLP | PyTorch | Python | Data Structures & Algorithms | Aspiring AI/ML Engineer
